@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Commander Deck Tracker</title>
-<link rel="stylesheet" href="https://unpkg.com/@tabler/icons-webfont@3.19.0/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/tabler-icons.min.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -63,7 +63,7 @@
   .pip-C { background: #9c8fbf; color: #fff; }
   .dtable { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
   .dtable th { text-align: left; padding: 6px 8px; color: var(--text2); font-weight: 500; border-bottom: 0.5px solid var(--border); white-space: nowrap; }
-  .dtable td { padding: 6px 8px; border-bottom: 0.5px solid var(--border); vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dtable td { padding: 6px 8px; border-bottom: 0.5px solid var(--border); vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .dtable td:last-child { overflow: visible; white-space: nowrap; }
   .dtable tr:last-child td { border-bottom: none; }
   .dtable a { color: var(--info-text); text-decoration: none; font-size: 12px; }
   .dtable a:hover { text-decoration: underline; }
@@ -480,7 +480,7 @@ function render(){
   else{
     const sorted=[...decks].sort((a,b)=>(a.bracket||'9').localeCompare(b.bracket||'9')||a.commander.localeCompare(b.commander));
     dl.innerHTML=`<table class="dtable"><thead><tr>
-      <th style="width:22%">Commander</th><th style="width:14%">Nickname</th><th style="width:10%">Colors</th>
+      <th style="width:19%">Commander</th><th style="width:12%">Nickname</th><th style="width:10%">Colors</th>
       <th style="width:12%">Type / theme</th><th style="width:7%">Bracket</th>
       <th style="width:9%">EDHREC</th><th style="width:9%">Archidekt</th><th style="width:10%"></th>
     </tr></thead><tbody>${sorted.map(d=>{
