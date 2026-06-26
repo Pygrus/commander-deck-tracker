@@ -1,10 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<style id="icon-fallback">
+/* Inline icon replacements - no CDN dependency */
+.ti { font-style: normal; font-weight: normal; display: inline-block; line-height: 1; }
+.ti-edit::before { content: "✎"; }
+.ti-trash::before { content: "🗑"; font-size: 0.9em; }
+.ti-check::before { content: "✓"; font-weight: bold; }
+.ti-x::before { content: "✕"; }
+.ti-plus::before { content: "+"; font-weight: bold; }
+.ti-star::before { content: "★"; }
+.ti-cards::before { content: "⊞"; }
+.ti-chart-bar::before { content: "▦"; }
+.ti-palette::before { content: "◉"; }
+.ti-external-link::before { content: "↗"; }
+</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Commander Deck Tracker</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/tabler-icons.min.css">
+
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
