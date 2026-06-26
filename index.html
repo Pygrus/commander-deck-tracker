@@ -94,9 +94,9 @@
   .bkt-bar-num { font-size: 13px; font-weight: 500; }
   .empty-state { color: var(--text2); font-size: 13px; padding: 1rem 0; text-align: center; }
   .err { font-size: 12px; color: var(--danger-text); margin-top: 4px; }
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; align-items: flex-start; justify-content: center; padding: 2rem 1rem; overflow-y: auto; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--bg); border: 0.5px solid var(--border2); border-radius: var(--radius-lg); padding: 1.25rem; width: 100%; max-width: 580px; margin: auto; }
+  .modal-overlay { display: none; padding: 2rem 1rem; }
+  .modal-overlay.open { display: block; }
+  .modal { background: var(--bg); border: 0.5px solid var(--border2); border-radius: var(--radius-lg); padding: 1.25rem; width: 100%; max-width: 580px; margin: 0 auto; }
   .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border-bottom: 0.5px solid var(--border); padding-bottom: .75rem; }
   .modal-title { font-size: 15px; font-weight: 500; }
   .modal-actions { display: flex; gap: 8px; margin-top: 1rem; }
@@ -262,7 +262,7 @@
 </div>
 
 <!-- EDIT MODAL -->
-<div id="editModal" class="modal-overlay" onclick="handleOverlayClick(event)">
+<div id="editModal" class="modal-overlay">
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="editModalTitle">Edit deck</span>
@@ -453,8 +453,8 @@ function saveEdit(){
   save();closeEdit();render();
 }
 
-function deleteDeck(id){if(confirm('Remove this deck?')){decks=decks.filter(d=>d.id!==id);save();render();}}
-function deleteWish(id){if(confirm('Remove this wishlist entry?')){wishes=wishes.filter(w=>w.id!==id);save();render();}}
+function deleteDeck(id){decks=decks.filter(d=>d.id!==id);save();render();}
+function deleteWish(id){wishes=wishes.filter(w=>w.id!==id);save();render();}
 function promoteWish(id){
   const w=wishes.find(x=>x.id===id);if(!w)return;
   decks.push({id:Date.now(),commander:w.commander,nickname:w.nickname,colors:w.colors,key:w.key,
