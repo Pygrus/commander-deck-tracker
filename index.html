@@ -641,22 +641,36 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById('authScreen').style.display = 'none';
     document.getElementById('appScreen').style.display = 'block';
 
+    // Restore friends panel if it was replaced by guest mode lock screen
+    const friendsPanel = document.getElementById('panel-friends');
+    if(friendsPanel && !friendsPanel.querySelector('.card:first-child .slabel')) {
+      // Panel was replaced — reload the page to restore full HTML
+      // Only do this if we weren't already a signed-in user (i.e., coming from guest)
+      if(window.guestMode === false && friendsPanel.querySelector('.io-btn')) {
+        window.location.reload();
+        return;
+      }
+    }
+
     // Set user info
     window.guestMode = false;
-    document.getElementById('guestBanner').style.display = 'none';
-    document.getElementById('userName').textContent = user.displayName || user.email;
+    const guestBanner = document.getElementById('guestBanner');
+    if(guestBanner) guestBanner.style.display = 'none';
+    const userNameEl = document.getElementById('userName');
+    if(userNameEl) userNameEl.textContent = user.displayName || user.email;
     const avatar = document.getElementById('userAvatar');
     const placeholder = document.getElementById('userAvatarPlaceholder');
-    if(user.photoURL) {
+    if(avatar && user.photoURL) {
       avatar.src = user.photoURL;
       avatar.style.display = 'block';
-      placeholder.style.display = 'none';
-    } else {
+      if(placeholder) placeholder.style.display = 'none';
+    } else if(placeholder) {
       placeholder.textContent = (user.displayName || user.email || '?')[0].toUpperCase();
     }
 
     // Set share link
-    document.getElementById('shareLink').textContent = window.location.href.split('?')[0] + '?view=' + user.uid;
+    const shareLinkEl = document.getElementById('shareLink');
+    if(shareLinkEl) shareLinkEl.textContent = window.location.href.split('?')[0] + '?view=' + user.uid;
 
     // Subscribe to real-time updates
     setSyncStatus('saving');
@@ -1322,6 +1336,7 @@ window.render = function render(){
 
   // Saved friends list
   const sfl=document.getElementById('savedFriendsList');
+  if(sfl) {
   if(!window.savedFriends||!window.savedFriends.length){
     sfl.innerHTML='<div class="empty-state" style="padding:.5rem 0">No saved friends yet — add one below.</div>';
   } else {
@@ -1337,6 +1352,7 @@ window.render = function render(){
         </div>
       </div>`).join('');
   }
+  } // end if(sfl)
 
   // Coverage
   const deckCountByKey={};
