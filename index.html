@@ -225,6 +225,19 @@ body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:
         <input class="finput" id="cmdName" placeholder="Commander name (e.g. Atraxa)">
         <input class="finput" id="deckName" placeholder="Deck nickname (optional)">
       </div>
+      <div style="margin-bottom:10px;display:flex;align-items:center;gap:8px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer;user-select:none">
+          <input type="checkbox" id="dPartner" onchange="togglePartnerField('dCmd2','dPartner','dEdhrecNote')" style="cursor:pointer">
+          Partner / Background / Friends Forever
+        </label>
+      </div>
+      <div id="dCmd2Wrap" style="display:none;margin-bottom:10px">
+        <div class="slabel">Second commander</div>
+        <input class="finput" id="dCmd2" placeholder="Partner commander name">
+        <div id="dEdhrecNote" style="font-size:11px;color:var(--text2);margin-top:5px;padding:6px 8px;background:var(--bg2);border-radius:var(--radius);border:0.5px solid var(--border)">
+          ⚠ Partner EDHREC links must be entered manually — the auto-generated link won't work for partner pairs. Look up your pair on EDHREC and paste the URL in the EDHREC URL field below.
+        </div>
+      </div>
       <div class="fg fg3">
         <div>
           <div class="slabel">Bracket</div>
@@ -372,6 +385,19 @@ body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:
     <div class="fg fg2">
       <div><div class="slabel">Commander name</div><input class="finput" id="eCmd" placeholder="Commander name"></div>
       <div><div class="slabel">Deck nickname</div><input class="finput" id="eNick" placeholder="Nickname (optional)"></div>
+    </div>
+    <div style="margin-bottom:8px;display:flex;align-items:center;gap:8px">
+      <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);cursor:pointer;user-select:none">
+        <input type="checkbox" id="ePartner" onchange="togglePartnerField('eCmd2','ePartner','eEdhrecNote')" style="cursor:pointer">
+        Partner / Background / Friends Forever
+      </label>
+    </div>
+    <div id="eCmd2Wrap" style="display:none;margin-bottom:10px">
+      <div class="slabel">Second commander</div>
+      <input class="finput" id="eCmd2" placeholder="Partner commander name">
+      <div id="eEdhrecNote" style="font-size:11px;color:var(--text2);margin-top:5px;padding:6px 8px;background:var(--bg2);border-radius:var(--radius);border:0.5px solid var(--border)">
+        ⚠ Partner EDHREC links must be entered manually — the auto-generated link won't work for partner pairs. Look up your pair on EDHREC and paste the URL in the EDHREC URL field below.
+      </div>
     </div>
     <div class="fg fg2">
       <div><div class="slabel">Bracket</div>
@@ -641,6 +667,11 @@ function pipsHTML(colors){return CO.filter(c=>colors.includes(c)).map(c=>`<div c
 function bktBadge(b){const cfg=BKT_CFG[b||''];return`<span class="bkt-badge" style="background:${cfg.bg};color:${cfg.tc};border-color:${cfg.tc}">${b?'B'+b:'?'}</span>`;}
 function edhrecURL(d){return d.edhrec||(d.commander?'https://edhrec.com/commanders/'+autoSlug(d.commander):'');}
 
+function togglePartnerField(fieldId, checkboxId, noteId){
+  const wrap=document.getElementById(fieldId+'Wrap');
+  if(wrap) wrap.style.display=document.getElementById(checkboxId).checked?'block':'none';
+}
+
 function save(){
   if(window.saveToFirebase) window.saveToFirebase();
 }
@@ -651,13 +682,16 @@ function addDeck(){
   if(!cmd){err.textContent='Enter a commander name.';err.style.display='block';return;}
   if(!selDeck.length){err.textContent='Select at least one color.';err.style.display='block';return;}
   err.style.display='none';
-  window.decks.push({id:Date.now(),commander:cmd,nickname:document.getElementById('deckName').value.trim(),
+  const cmd2=document.getElementById('dCmd2').value.trim();
+  window.decks.push({id:Date.now(),commander:cmd,commander2:cmd2,nickname:document.getElementById('deckName').value.trim(),
     colors:[...selDeck],key:colorKey(selDeck),bracket:document.getElementById('dBracket').value,
     archi:document.getElementById('dArchi').value.trim(),edhrec:document.getElementById('dEdhrec').value.trim(),
     deckType:document.getElementById('dType').value.trim(),notes:''});
   save();
-  ['cmdName','deckName','dArchi','dEdhrec','dType'].forEach(id=>document.getElementById(id).value='');
+  ['cmdName','deckName','dArchi','dEdhrec','dType','dCmd2'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('dBracket').value='';
+  document.getElementById('dPartner').checked=false;
+  document.getElementById('dCmd2Wrap').style.display='none';
   selDeck=[];document.querySelectorAll('#colorPips .pip').forEach(p=>{p.classList.remove('sel');p.classList.add('unsel');});
   render();
 }
@@ -683,6 +717,10 @@ function openEdit(id){
   editingId=id;
   document.getElementById('eCmd').value=d.commander;
   document.getElementById('eNick').value=d.nickname||'';
+  const hasPartner=!!(d.commander2);
+  document.getElementById('ePartner').checked=hasPartner;
+  document.getElementById('eCmd2').value=d.commander2||'';
+  document.getElementById('eCmd2Wrap').style.display=hasPartner?'block':'none';
   document.getElementById('eBracket').value=d.bracket||'';
   document.getElementById('eType').value=d.deckType||'';
   document.getElementById('eEdhrec').value=d.edhrec||'';
@@ -697,7 +735,13 @@ function openEdit(id){
   document.getElementById('editErr').style.display='none';
   document.getElementById('editModal').classList.add('open');
 }
-function closeEdit(){document.getElementById('editModal').classList.remove('open');editingId=null;selEdit=[];}
+function closeEdit(){
+  document.getElementById('editModal').classList.remove('open');
+  document.getElementById('ePartner').checked=false;
+  document.getElementById('eCmd2Wrap').style.display='none';
+  document.getElementById('eCmd2').value='';
+  editingId=null;selEdit=[];
+}
 function saveEdit(){
   const cmd=document.getElementById('eCmd').value.trim();
   const err=document.getElementById('editErr');
@@ -705,7 +749,8 @@ function saveEdit(){
   if(!selEdit.length){err.textContent='Select at least one color.';err.style.display='block';return;}
   err.style.display='none';
   const idx=window.decks.findIndex(x=>x.id===editingId);if(idx===-1)return;
-  window.decks[idx]={...window.decks[idx],commander:cmd,nickname:document.getElementById('eNick').value.trim(),
+  const cmd2e=document.getElementById('eCmd2').value.trim();
+  window.decks[idx]={...window.decks[idx],commander:cmd,commander2:cmd2e,nickname:document.getElementById('eNick').value.trim(),
     bracket:document.getElementById('eBracket').value,deckType:document.getElementById('eType').value.trim(),
     edhrec:document.getElementById('eEdhrec').value.trim(),archi:document.getElementById('eArchi').value.trim(),
     notes:document.getElementById('eNotes').value.trim(),colors:[...selEdit],key:colorKey(selEdit)};
@@ -787,7 +832,7 @@ async function viewFriend(){
       const eurl=d.edhrec||(d.commander?'https://edhrec.com/commanders/'+autoSlug(d.commander):'');
       const combo=ALL_COMBOS.find(c=>c.key===d.key);
       return`<tr>
-        <td style="font-weight:500">${d.commander}</td>
+        <td style="font-weight:500">${d.commander}${d.commander2?` <span style='color:var(--text2);font-size:11px'>+ ${d.commander2}</span>`:''}</td>
         <td style="color:var(--text2)">${d.nickname||'—'}</td>
         <td><div class="pips-display">${pipsHTML(d.colors)}</div></td>
         <td>${d.deckType?`<span class="deck-type-tag">${d.deckType}</span>`:'—'}</td>
@@ -822,7 +867,7 @@ window.render = function render(){
     </tr></thead><tbody>${sorted.map(d=>{
       const eurl=edhrecURL(d);const combo=ALL_COMBOS.find(c=>c.key===d.key);
       return`<tr>
-        <td style="font-weight:500">${d.commander}</td>
+        <td style="font-weight:500">${d.commander}${d.commander2?` <span style='color:var(--text2);font-size:11px'>+ ${d.commander2}</span>`:''}</td>
         <td style="color:var(--text2)">${d.nickname||'—'}</td>
         <td><div class="pips-display">${pipsHTML(d.colors)}</div></td>
         <td>${d.deckType?`<span class="deck-type-tag">${d.deckType}</span>`:'<span style="color:var(--text3);font-size:12px">—</span>'}</td>
@@ -858,7 +903,7 @@ window.render = function render(){
       html+=`<div style="margin-bottom:14px">
         <div style="font-size:12px;font-weight:500;padding:3px 10px;border-radius:var(--radius);background:${cfg.bg};color:${cfg.tc};display:inline-block;margin-bottom:8px">${cfg.label} · ${group.length} deck${group.length!==1?'s':''}</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px">${group.map(d=>`<div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:6px 12px;font-size:13px;cursor:pointer" onclick="openEdit(${d.id})" title="Click to edit">
-          <span style="font-weight:500">${d.commander}</span>${d.nickname?`<span style="color:var(--text2);margin-left:5px;font-size:12px">${d.nickname}</span>`:''}${d.deckType?`<span style="margin-left:5px;font-size:11px;color:var(--text2)">[${d.deckType}]</span>`:''}
+          <span style="font-weight:500">${d.commander}${d.commander2?' + '+d.commander2:''}</span>${d.nickname?`<span style="color:var(--text2);margin-left:5px;font-size:12px">${d.nickname}</span>`:''}${d.deckType?`<span style="margin-left:5px;font-size:11px;color:var(--text2)">[${d.deckType}]</span>`:''}
           <div style="margin-top:3px;display:flex;gap:3px">${pipsHTML(d.colors)}</div>
         </div>`).join('')}</div>
       </div>`;
