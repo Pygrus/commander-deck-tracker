@@ -110,6 +110,26 @@ body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:
 .dtable a:hover{text-decoration:underline}
 .icon-btn{background:none;border:none;cursor:pointer;color:var(--text2);padding:2px 4px;border-radius:4px;font-size:15px;line-height:1}
 .icon-btn.edit:hover{color:var(--info-text)}.icon-btn.del:hover{color:var(--danger-text)}.icon-btn.promote:hover{color:var(--success-text)}
+
+/* Deck card list */
+.deck-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.deck-toolbar .finput,.deck-toolbar .fsel{width:auto;min-width:150px;background:var(--bg2)}
+.deck-toolbar .deck-search{flex:1;min-width:220px}
+.deck-card-list{display:grid;gap:8px}
+.deck-list-card{display:grid;grid-template-columns:minmax(180px,1.5fr) minmax(92px,.6fr) minmax(130px,.8fr) minmax(108px,.7fr) auto;gap:10px;align-items:center;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;transition:transform .12s,background .12s,border-color .12s}
+.deck-list-card:hover{background:var(--bg);border-color:var(--border2);transform:translateY(-1px)}
+.deck-main{min-width:0}
+.deck-title{font-size:14px;font-weight:600;line-height:1.25;white-space:normal}
+.deck-subtitle{font-size:12px;color:var(--text2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.deck-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;min-width:0}
+.deck-links{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.deck-link-pill{font-size:11px;text-decoration:none;color:var(--info-text);background:var(--info-bg);border:0.5px solid var(--info-border);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.deck-link-pill.muted{color:var(--text3);background:transparent;border-color:var(--border);pointer-events:none}
+.deck-actions{display:flex;gap:4px;justify-content:flex-end}
+.deck-notes-preview{font-size:11px;color:var(--text2);margin-top:4px;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.deck-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.deck-count-hint{font-size:12px;color:var(--text2);font-weight:400;text-transform:none;letter-spacing:0}
+@media(max-width:760px){.deck-list-card{grid-template-columns:1fr;gap:7px}.deck-links,.deck-actions{justify-content:flex-start}.deck-toolbar .finput,.deck-toolbar .fsel{width:100%;min-width:0}.deck-toolbar .deck-search{min-width:0}}
 .pips-display{display:flex;gap:3px;flex-wrap:wrap}
 .mpip{width:15px;height:15px;border-radius:50%;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .mpip-W{background:#f5f0d8;color:#6b5d2f;border:1px solid #c8b87a}.mpip-U{background:#3a7ebf;color:#fff}
@@ -289,7 +309,7 @@ body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:
           <input class="finput" id="dType" placeholder="e.g. Tokens, Lifegain...">
         </div>
         <div>
-          <div class="slabel">Color identity</div>
+          <div class="slabel">Color identity <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">(auto-filled)</span></div>
           <div class="colors-row" id="colorPips" style="margin-bottom:0">
             <div class="pip pip-W unsel" data-c="W" onclick="toggleColor(this,'deck')">W</div>
             <div class="pip pip-U unsel" data-c="U" onclick="toggleColor(this,'deck')">U</div>
@@ -314,8 +334,28 @@ body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:
       <button class="add-btn" onclick="addDeck()"><i class="ti ti-plus"></i> Add deck</button>
     </div>
     <div class="card">
-      <div class="slabel" style="margin-bottom:10px">Built decks</div>
-      <div style="overflow-x:auto" id="deckList"></div>
+      <div class="deck-section-head">
+        <div class="slabel" style="margin-bottom:0">Built decks <span class="deck-count-hint" id="deckResultCount"></span></div>
+      </div>
+      <div class="deck-toolbar">
+        <input class="finput deck-search" id="deckSearch" placeholder="Search commander, nickname, theme, notes..." oninput="render()">
+        <select class="fsel" id="deckFilterColor" onchange="render()">
+          <option value="">All colors</option>
+          <option value="W">White</option><option value="U">Blue</option><option value="B">Black</option><option value="R">Red</option><option value="G">Green</option><option value="C">Colorless</option>
+          <option value="WUBRG">5-color</option>
+        </select>
+        <select class="fsel" id="deckFilterBracket" onchange="render()">
+          <option value="">All brackets</option>
+          <option value="1">B1</option><option value="2">B2</option><option value="3">B3</option><option value="4">B4</option><option value="4.5">B4.5</option><option value="5">B5</option><option value="unknown">Unknown</option>
+        </select>
+        <select class="fsel" id="deckSort" onchange="render()">
+          <option value="bracket">Sort: Bracket</option>
+          <option value="commander">Sort: Commander</option>
+          <option value="color">Sort: Color</option>
+          <option value="theme">Sort: Theme</option>
+        </select>
+      </div>
+      <div id="deckList"></div>
     </div>
   </div>
 
@@ -340,7 +380,7 @@ body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:
         </div>
         <input class="finput" id="wDeckName" placeholder="Deck concept (optional)">
       </div>
-      <div class="slabel">Color identity</div>
+      <div class="slabel">Color identity <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">(auto-filled)</span></div>
       <div class="colors-row" id="wColorPips">
         <div class="pip pip-W unsel" data-c="W" onclick="toggleColor(this,'wish')">W</div>
         <div class="pip pip-U unsel" data-c="U" onclick="toggleColor(this,'wish')">U</div>
@@ -477,7 +517,7 @@ body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:
       </div>
       <div><div class="slabel">Deck type / theme</div><input class="finput" id="eType" placeholder="e.g. Tokens, Lifegain, Combo..."></div>
     </div>
-    <div style="margin-bottom:10px"><div class="slabel">Color identity</div>
+    <div style="margin-bottom:10px"><div class="slabel">Color identity <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px">(auto-filled)</span></div>
       <div class="colors-row" id="eColorPips">
         <div class="pip pip-W unsel" data-c="W" onclick="toggleColor(this,'edit')">W</div>
         <div class="pip pip-U unsel" data-c="U" onclick="toggleColor(this,'edit')">U</div>
@@ -888,7 +928,84 @@ function scryPick(inputId, dropId, name) {
   document.getElementById(inputId).value = name;
   document.getElementById(dropId).style.display = 'none';
   scryActive[dropId] = -1;
+  // Auto-fill color identity when a commander is picked from autocomplete
+  autoFillColorsForInput(inputId);
 }
+
+// ── Color identity auto-fill ──────────────────────────────────────────────────
+const scryColorCache = {};
+const commanderInputMode = {cmdName:'deck',dCmd2:'deck',wCmdName:'wish',eCmd:'edit',eCmd2:'edit'};
+
+function normalizeColorIdentity(colors){
+  const clean = (colors||[]).filter(c=>CO.includes(c)&&c!=='C');
+  return clean.length ? CO.filter(c=>clean.includes(c)) : ['C'];
+}
+
+function setSelectedColors(mode, colors){
+  const normalized = normalizeColorIdentity(colors);
+  if(mode==='deck') selDeck=[...normalized];
+  else if(mode==='wish') selWish=[...normalized];
+  else selEdit=[...normalized];
+  const pipsId=mode==='deck'?'#colorPips':mode==='wish'?'#wColorPips':'#eColorPips';
+  document.querySelectorAll(pipsId+' .pip').forEach(p=>{
+    const selected=normalized.includes(p.dataset.c);
+    p.classList.toggle('sel',selected);
+    p.classList.toggle('unsel',!selected);
+  });
+}
+
+async function fetchCommanderColorIdentity(name){
+  const key=name.trim().toLowerCase();
+  if(!key) return null;
+  if(scryColorCache[key]) return scryColorCache[key];
+  try{
+    const res=await fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(name.trim())}`);
+    if(!res.ok) return null;
+    const data=await res.json();
+    const colors=normalizeColorIdentity(data.color_identity||[]);
+    scryColorCache[key]=colors;
+    return colors;
+  }catch(e){
+    return null;
+  }
+}
+
+async function autoFillColorsForMode(mode){
+  let names=[];
+  if(mode==='deck'){
+    names.push(document.getElementById('cmdName')?.value.trim()||'');
+    if(document.getElementById('dPartner')?.checked) names.push(document.getElementById('dCmd2')?.value.trim()||'');
+  } else if(mode==='edit'){
+    names.push(document.getElementById('eCmd')?.value.trim()||'');
+    if(document.getElementById('ePartner')?.checked) names.push(document.getElementById('eCmd2')?.value.trim()||'');
+  } else if(mode==='wish'){
+    names.push(document.getElementById('wCmdName')?.value.trim()||'');
+  }
+  names=names.filter(Boolean);
+  if(!names.length) return;
+  const found=[];
+  for(const name of names){
+    const colors=await fetchCommanderColorIdentity(name);
+    if(colors) found.push(...colors);
+  }
+  if(found.length) setSelectedColors(mode,[...new Set(found)]);
+}
+
+function autoFillColorsForInput(inputId){
+  const mode=commanderInputMode[inputId];
+  if(mode) autoFillColorsForMode(mode);
+}
+
+function attachColorIdentityLookups(){
+  Object.keys(commanderInputMode).forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('blur',()=>autoFillColorsForInput(id));
+    el.addEventListener('change',()=>autoFillColorsForInput(id));
+  });
+}
+attachColorIdentityLookups();
+
 
 function scryHover(dropId, idx) {
   scryActive[dropId] = idx;
@@ -1403,29 +1520,62 @@ window.render = function render(){
   document.getElementById('statWish').textContent=wishes.length;
   document.getElementById('statArchi').textContent=decks.filter(d=>d.archi).length;
 
-  // Decks table
+  // Deck card list with search / filter / sort
   const dl=document.getElementById('deckList');
+  const q=(document.getElementById('deckSearch')?.value||'').toLowerCase();
+  const fColor=document.getElementById('deckFilterColor')?.value||'';
+  const fBracket=document.getElementById('deckFilterBracket')?.value||'';
+  const sortBy=document.getElementById('deckSort')?.value||'bracket';
+
+  let filtered=[...decks];
+  if(q) filtered=filtered.filter(d=>
+    (d.commander||'').toLowerCase().includes(q)||
+    (d.commander2||'').toLowerCase().includes(q)||
+    (d.nickname||'').toLowerCase().includes(q)||
+    (d.deckType||'').toLowerCase().includes(q)||
+    (d.notes||'').toLowerCase().includes(q)
+  );
+  if(fColor==='WUBRG') filtered=filtered.filter(d=>['W','U','B','R','G'].every(c=>d.colors.includes(c)));
+  else if(fColor) filtered=filtered.filter(d=>d.colors.includes(fColor));
+  if(fBracket==='unknown') filtered=filtered.filter(d=>!d.bracket);
+  else if(fBracket) filtered=filtered.filter(d=>d.bracket===fBracket);
+
+  filtered.sort((a,b)=>{
+    if(sortBy==='commander') return a.commander.localeCompare(b.commander);
+    if(sortBy==='color') return (a.key||'').localeCompare(b.key||'');
+    if(sortBy==='theme') return (a.deckType||'').localeCompare(b.deckType||'');
+    return (a.bracket||'9').localeCompare(b.bracket||'9')||a.commander.localeCompare(b.commander);
+  });
+
+  const hint=document.getElementById('deckResultCount');
+  if(hint) hint.textContent=filtered.length!==decks.length?`(${filtered.length} of ${decks.length})`:`(${decks.length})`;
+
   if(!decks.length){dl.innerHTML='<div class="empty-state">No decks yet. Add your first one above!</div>';}
+  else if(!filtered.length){dl.innerHTML='<div class="empty-state">No decks match your filters.</div>';}
   else{
-    const sorted=[...decks].sort((a,b)=>(a.bracket||'9').localeCompare(b.bracket||'9')||a.commander.localeCompare(b.commander));
-    dl.innerHTML=`<table class="dtable"><thead><tr>
-      <th>Commander</th><th>Nickname</th><th>Colors</th><th>Type / theme</th><th>Bracket</th><th>EDHREC</th><th>Deck link</th><th></th>
-    </tr></thead><tbody>${sorted.map(d=>{
-      const eurl=edhrecURL(d);const combo=ALL_COMBOS.find(c=>c.key===d.key);
-      return`<tr>
-        <td style="font-weight:500">${d.commander}${d.commander2?` <span style='color:var(--text2);font-size:11px'>+ ${d.commander2}</span>`:''}</td>
-        <td style="color:var(--text2)">${d.nickname||'—'}</td>
-        <td><div class="pips-display">${pipsHTML(d.colors)}</div></td>
-        <td>${d.deckType?`<span class="deck-type-tag">${d.deckType}</span>`:'<span style="color:var(--text3);font-size:12px">—</span>'}</td>
-        <td>${bktBadge(d.bracket)}</td>
-        <td>${eurl?`<a href="${eurl}" target="_blank" rel="noopener">↗ View</a>`:'<span style="color:var(--text3);font-size:12px">—</span>'}</td>
-        <td>${d.archi?`<a href="${d.archi}" target="_blank" rel="noopener">↗ View</a>`:'<span style="color:var(--text3);font-size:12px">—</span>'}</td>
-        <td style="white-space:nowrap">
-          <button class="icon-btn edit" onclick="openEdit(${d.id})" title="Edit"><i class="ti ti-edit"></i></button>
-          <button class="icon-btn del" onclick="deleteDeck(${d.id})" title="Remove"><i class="ti ti-trash"></i></button>
-        </td>
-      </tr>`;
-    }).join('')}</tbody></table>`;
+    dl.innerHTML=`<div class="deck-card-list">${filtered.map(d=>{
+      const eurl=edhrecURL(d);
+      return`<div class="deck-list-card">
+        <div class="deck-main">
+          <div class="deck-title">${d.commander}${d.commander2?`<span style='color:var(--text2);font-size:12px;font-weight:400'> + ${d.commander2}</span>`:''}</div>
+          ${d.nickname?`<div class="deck-subtitle">${d.nickname}</div>`:''}
+          ${d.notes?`<div class="deck-notes-preview">${d.notes}</div>`:''}
+        </div>
+        <div class="deck-meta"><div class="pips-display">${pipsHTML(d.colors)}</div></div>
+        <div class="deck-meta">${d.deckType?`<span class="deck-type-tag">${d.deckType}</span>`:'<span style="color:var(--text3);font-size:12px">No theme</span>'}</div>
+        <div class="deck-meta">${bktBadge(d.bracket)}</div>
+        <div>
+          <div class="deck-links">
+            ${eurl?`<a class="deck-link-pill" href="${eurl}" target="_blank" rel="noopener">EDHREC</a>`:'<span class="deck-link-pill muted">EDHREC</span>'}
+            ${d.archi?`<a class="deck-link-pill" href="${d.archi}" target="_blank" rel="noopener">Deck</a>`:'<span class="deck-link-pill muted">Deck</span>'}
+          </div>
+          <div class="deck-actions" style="margin-top:6px">
+            <button class="icon-btn edit" onclick="openEdit(${d.id})" title="Edit"><i class="ti ti-edit"></i></button>
+            <button class="icon-btn del" onclick="deleteDeck(${d.id})" title="Remove"><i class="ti ti-trash"></i></button>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}</div>`;
   }
 
   // Brackets
