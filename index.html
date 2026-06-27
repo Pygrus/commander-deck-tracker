@@ -97,8 +97,8 @@ body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:
 .pip{width:27px;height:27px;border-radius:50%;border:2px solid transparent;cursor:pointer;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:transform .1s,opacity .1s}
 .pip:hover{transform:scale(1.1)}.pip.sel{border-color:#fff;box-shadow:0 0 0 2px #888;transform:scale(1.08)}.pip.unsel{opacity:.35}
 .pip-W{background:#f5f0d8;color:#6b5d2f}.pip-U{background:#3a7ebf;color:#fff}
-/* Filter pips — smaller, all visible, active state uses ring */
-.fpip{width:22px;height:22px;min-width:22px;min-height:22px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:transform .1s,box-shadow .1s,opacity .1s;opacity:.3;flex-shrink:0;align-self:center;box-sizing:border-box}
+/* Filter pips */
+.fpip{width:22px;height:22px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;transition:transform .1s,box-shadow .1s,opacity .1s;opacity:.3}
 .fpip:hover{opacity:.65;transform:scale(1.1)}
 .fpip.fsel{opacity:1;transform:scale(1.12)}
 .fpip.pip-W.fsel{box-shadow:0 0 0 2.5px #6b5d2f}
@@ -107,7 +107,6 @@ body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:
 .fpip.pip-R.fsel{box-shadow:0 0 0 2.5px #c73f2e}
 .fpip.pip-G.fsel{box-shadow:0 0 0 2.5px #3a7a45}
 .fpip.pip-C.fsel{box-shadow:0 0 0 2.5px #9c8fbf}
-.filter-pips{display:flex;gap:4px;align-items:center;padding:2px 0;flex-shrink:0}
 .pip-B{background:#2c2c2c;color:#e0d7c6}.pip-R{background:#c73f2e;color:#fff}
 .pip-G{background:#3a7a45;color:#fff}.pip-C{background:#9c8fbf;color:#fff}
 
@@ -350,14 +349,6 @@ body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:
       </div>
       <div class="deck-toolbar">
         <input class="finput deck-search" id="deckSearch" placeholder="Search commander, nickname, theme, notes..." oninput="render()">
-        <div class="filter-pips" id="deckColorFilter" title="Filter by color (contains match)">
-          <div class="fpip pip-W" data-c="W" onclick="toggleFilterPip(this,'deckColorFilter')">W</div>
-          <div class="fpip pip-U" data-c="U" onclick="toggleFilterPip(this,'deckColorFilter')">U</div>
-          <div class="fpip pip-B" data-c="B" onclick="toggleFilterPip(this,'deckColorFilter')">B</div>
-          <div class="fpip pip-R" data-c="R" onclick="toggleFilterPip(this,'deckColorFilter')">R</div>
-          <div class="fpip pip-G" data-c="G" onclick="toggleFilterPip(this,'deckColorFilter')">G</div>
-          <div class="fpip pip-C" data-c="C" onclick="toggleFilterPip(this,'deckColorFilter')" title="Colorless">∅</div>
-        </div>
         <select class="fsel" id="deckFilterBracket" onchange="render()">
           <option value="">All brackets</option>
           <option value="1">B1</option><option value="2">B2</option><option value="3">B3</option><option value="4">B4</option><option value="4.5">B4.5</option><option value="5">B5</option><option value="unknown">Unknown</option>
@@ -368,6 +359,17 @@ body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:
           <option value="color">Sort: Color</option>
           <option value="theme">Sort: Theme</option>
         </select>
+      </div>
+      <div style="display:inline-flex;gap:5px;align-items:center;margin-bottom:10px">
+        <span style="font-size:11px;color:var(--text2);margin-right:2px">Color:</span>
+        <div id="deckColorFilter" style="display:inline-flex;gap:4px;align-items:center">
+          <div class="fpip pip-W" data-c="W" onclick="toggleFilterPip(this,'deckColorFilter')">W</div>
+          <div class="fpip pip-U" data-c="U" onclick="toggleFilterPip(this,'deckColorFilter')">U</div>
+          <div class="fpip pip-B" data-c="B" onclick="toggleFilterPip(this,'deckColorFilter')">B</div>
+          <div class="fpip pip-R" data-c="R" onclick="toggleFilterPip(this,'deckColorFilter')">R</div>
+          <div class="fpip pip-G" data-c="G" onclick="toggleFilterPip(this,'deckColorFilter')">G</div>
+          <div class="fpip pip-C" data-c="C" onclick="toggleFilterPip(this,'deckColorFilter')" title="Colorless">∅</div>
+        </div>
       </div>
       <div id="deckList"></div>
     </div>
@@ -423,14 +425,6 @@ body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:
       </div>
       <div class="deck-toolbar">
         <input class="finput deck-search" id="wishSearch" placeholder="Search commander, concept, theme, notes..." oninput="render()">
-        <div class="filter-pips" id="wishColorFilter" title="Filter by color (contains match)">
-          <div class="fpip pip-W" data-c="W" onclick="toggleFilterPip(this,'wishColorFilter')">W</div>
-          <div class="fpip pip-U" data-c="U" onclick="toggleFilterPip(this,'wishColorFilter')">U</div>
-          <div class="fpip pip-B" data-c="B" onclick="toggleFilterPip(this,'wishColorFilter')">B</div>
-          <div class="fpip pip-R" data-c="R" onclick="toggleFilterPip(this,'wishColorFilter')">R</div>
-          <div class="fpip pip-G" data-c="G" onclick="toggleFilterPip(this,'wishColorFilter')">G</div>
-          <div class="fpip pip-C" data-c="C" onclick="toggleFilterPip(this,'wishColorFilter')" title="Colorless">∅</div>
-        </div>
         <select class="fsel" id="wishFilterPriority" onchange="render()">
           <option value="">All priorities</option>
           <option value="high">High</option>
@@ -443,6 +437,17 @@ body{font-family:var(--font);background:var(--bg3);color:var(--text);min-height:
           <option value="color">Sort: Color</option>
           <option value="theme">Sort: Theme</option>
         </select>
+      </div>
+      <div style="display:inline-flex;gap:5px;align-items:center;margin-bottom:10px">
+        <span style="font-size:11px;color:var(--text2);margin-right:2px">Color:</span>
+        <div id="wishColorFilter" style="display:inline-flex;gap:4px;align-items:center">
+          <div class="fpip pip-W" data-c="W" onclick="toggleFilterPip(this,'wishColorFilter')">W</div>
+          <div class="fpip pip-U" data-c="U" onclick="toggleFilterPip(this,'wishColorFilter')">U</div>
+          <div class="fpip pip-B" data-c="B" onclick="toggleFilterPip(this,'wishColorFilter')">B</div>
+          <div class="fpip pip-R" data-c="R" onclick="toggleFilterPip(this,'wishColorFilter')">R</div>
+          <div class="fpip pip-G" data-c="G" onclick="toggleFilterPip(this,'wishColorFilter')">G</div>
+          <div class="fpip pip-C" data-c="C" onclick="toggleFilterPip(this,'wishColorFilter')" title="Colorless">∅</div>
+        </div>
       </div>
       <div id="wishList"></div>
     </div>
