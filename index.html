@@ -914,14 +914,18 @@ function scrySearch(input, dropId) {
       }
       scryActive[dropId] = -1;
       drop.innerHTML = data.data.slice(0,10).map((name,i) =>
-        `<div class="scry-item" data-name="${name}" data-idx="${i}"
-          onmousedown="scryPick('${input.id}','${dropId}','${name.replace(/'/g,"\'")}')"
+        `<div class="scry-item" data-name="${name.replace(/"/g,'&quot;')}" data-idx="${i}"
+          onmousedown="scryPickFromEl(this,'${input.id}','${dropId}')"
           onmouseover="scryHover('${dropId}',${i})">${name}</div>`
       ).join('');
     } catch(e) {
       drop.style.display = 'none';
     }
   }, 200);
+}
+
+function scryPickFromEl(el, inputId, dropId) {
+  scryPick(inputId, dropId, el.dataset.name);
 }
 
 function scryPick(inputId, dropId, name) {
